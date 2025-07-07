@@ -3,10 +3,22 @@ import "./App.css";
 
 // PUBLIC_INTERFACE
 function App() {
-  // App theme setup for toggle (optional), always light by requirement
+  // --- THEME SETUP ---
+  // Try to load theme from localStorage or use 'light' by default
+  const getInitialTheme = () => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("theme");
+      if (saved && (saved === "light" || saved === "dark")) return saved;
+    }
+    return "light";
+  };
+  const [theme, setTheme] = useState(getInitialTheme);
+
+  // Set document data-theme attribute on theme change
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", "light");
-  }, []);
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
   // Colors (for inline styles if needed)
   const COLORS = {
@@ -103,6 +115,9 @@ function App() {
   // PUBLIC_INTERFACE
   const selectCategory = (cat) => setCategory(cat);
 
+  // PUBLIC_INTERFACE
+  const toggleTheme = () => setTheme((t) => (t === "light" ? "dark" : "light"));
+
   // --- RENDER ---
   return (
     <div className="notes-app-root">
@@ -122,6 +137,8 @@ function App() {
           accent={COLORS.accent}
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
+          theme={theme}
+          onToggleTheme={toggleTheme}
         />
         <NotesList notes={filteredNotes} onSelect={openModalToEdit} />
       </main>
@@ -190,7 +207,8 @@ function Sidebar({
 }
 
 // --- HEADER COMPONENT ---
-function NotesHeader({ search, setSearch, onNewNote, accent, sidebarOpen, setSidebarOpen }) {
+// Add theme toggle button to right of search
+function NotesHeader({ search, setSearch, onNewNote, accent, sidebarOpen, setSidebarOpen, theme = "light", onToggleTheme }) {
   return (
     <div className="main-header">
       <div className="main-header-left">
@@ -206,7 +224,7 @@ function NotesHeader({ search, setSearch, onNewNote, accent, sidebarOpen, setSid
         )}
         <h1 className="main-title">Notes</h1>
       </div>
-      <div className="main-header-right">
+      <div className="main-header-right" style={{ display: 'flex', alignItems: 'center', gap: '0.7em' }}>
         <input
           className="search-input"
           value={search}
@@ -214,6 +232,30 @@ function NotesHeader({ search, setSearch, onNewNote, accent, sidebarOpen, setSid
           placeholder="Search notes..."
           aria-label="Search notes"
         />
+        {/* Theme Toggle Button */}
+        <button
+          onClick={onToggleTheme}
+          aria-label="Toggle dark/light theme"
+          title={`Switch to ${theme === "light" ? "Dark" : "Light"} mode`}
+          style={{
+            background: "transparent",
+            border: "none",
+            cursor: "pointer",
+            fontSize: "1.29em",
+            color: "var(--primary)",
+            marginRight: 2,
+            outline: "none",
+            borderRadius: "6px",
+            transition: "background 0.15s"
+          }}
+        >
+          {/* Use icons for moon/sun depending on theme */}
+          {theme === "light" ? (
+            <span role="img" aria-label="Dark mode" style={{filter: "grayscale(.30)"}}>🌑</span>
+          ) : (
+            <span role="img" aria-label="Light mode">🌕</span>
+          )}
+        </button>
         <button
           className="new-note-btn"
           style={{ background: accent }}

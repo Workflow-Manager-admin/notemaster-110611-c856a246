@@ -12,6 +12,26 @@
   --focus: #ff408133;
 }
 
+/* Dark theme variables (activated by data-theme="dark" on html tag) */
+[data-theme="dark"] {
+  --primary: #90caf9;
+  --secondary: #313340;
+  --accent: #ff4081;
+  --bg-main: #181c20;
+  --bg-sidebar: #14191f;
+  --bg-modal: #21222b;
+  --bg-list: #242935;
+  --border: #373a45;
+  --text-main: #f6f7fa;
+  --text-light: #b2b8c5;
+  --focus: #ff40811a;
+}
+
+/* nice transition for theme change */
+body, .notes-app-root, .sidebar, .notes-main, .main-header, .modal, .note-item {
+  transition: background 0.2s, color 0.18s, border 0.16s;
+}
+
 /* Root Layout */
 .notes-app-root {
   min-height: 100vh;
